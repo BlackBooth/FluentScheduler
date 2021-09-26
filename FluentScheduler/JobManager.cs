@@ -357,14 +357,51 @@ public static class JobManager
         var firstJob = _schedules.First();
         if (firstJob.NextRun <= Now)
         {
-            RunJob(firstJob);
-            if (firstJob.CalculateNextRun == null)
+            while (true)
             {
-                // probably a ToRunNow().DelayFor() job, there's no CalculateNextRun
-            }
-            else
-            {
-                firstJob.NextRun = firstJob.CalculateNextRun(Now.AddMilliseconds(1));
+                _timer.Change(Timeout.Infinite, Timeout.Infinite);
+                _schedules.Sort();
+
+                if (!_schedules.Any())
+                    break;
+
+                var firstJob = _schedules.First();
+                if (firstJob.NextRun <= Now)
+                {
+                    RunJob(firstJob);
+                    if (firstJob.CalculateNextRun == null)
+                    {
+                        // probably a ToRunNow().DelayFor() job, there's no CalculateNextRun
+                    }
+                    else
+                    {
+                        firstJob.NextRun = firstJob.CalculateNextRun(Now.AddMilliseconds(1));
+                    }
+
+                    if (firstJob.NextRun <= Now || firstJob.PendingRunOnce)
+                    {
+                        _schedules.Remove(firstJob);
+                    }
+
+                    firstJob.PendingRunOnce = false;
+                    continue;
+                }
+
+                var interval = firstJob.NextRun - Now;
+
+                if (interval <= TimeSpan.Zero)
+                {
+                    continue;
+                }
+                else
+                {
+                    if (interval.TotalMilliseconds > _maxTimerInterval)
+                        interval = TimeSpan.FromMilliseconds(_maxTimerInterval);
+
+                    _timer.Change(interval, interval);
+                }
+
+                break;
             }
 
             if (firstJob.NextRun <= Now || firstJob.PendingRunOnce)
