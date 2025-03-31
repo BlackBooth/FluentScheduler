@@ -1,0 +1,5 @@
+﻿<Solution>
+  <Project Path="FluentScheduler.TestApplication\FluentScheduler.TestApplication.csproj" Type="Classic C#" />
+  <Project Path="FluentScheduler.UnitTests\FluentScheduler.UnitTests.csproj" Type="Classic C#" />
+  <Project Path="FluentScheduler\FluentScheduler.csproj" Type="Classic C#" />
+</Solution>
