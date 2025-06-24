@@ -8,8 +8,20 @@
     <PackageProjectUrl>https://github.com/fluentscheduler/FluentScheduler</PackageProjectUrl>
     <PackageTags>background cron job schedule task</PackageTags>
     <RepositoryUrl>https://github.com/fluentscheduler/FluentScheduler</RepositoryUrl>
-    <TargetFrameworks>net8.0</TargetFrameworks>
-    <Version>5.5.3</Version>
+    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+    <Version>5.5.2</Version>
+    <LangVersion>latest</LangVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <AssemblyVersion>5.5.2</AssemblyVersion>
+    <FileVersion>5.5.2</FileVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DocumentationFile>bin\Debug\FluentScheduler.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DocumentationFile>bin\Release\FluentScheduler.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
