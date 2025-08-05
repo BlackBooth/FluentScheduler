@@ -1,4 +1,4 @@
-﻿namespace FluentScheduler.TestApplication;
+namespace FluentScheduler.TestApplication;
 
 using static Serilog.Log;
 
