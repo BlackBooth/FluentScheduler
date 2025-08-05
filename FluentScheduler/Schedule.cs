@@ -11,37 +11,79 @@ public class Schedule
     /// <summary>
     /// Date and time of the next run of this job schedule.
     /// </summary>
-    public DateTime NextRun { get; internal set; }
+    public DateTime NextRun
+    {
+        get;
+        internal set;
+    }
 
     /// <summary>
     /// Name of this job schedule.
     /// </summary>
-    public string Name { get; internal set; }
+    public string Name
+    {
+        get;
+        internal set;
+    }
 
     /// <summary>
     /// Flag indicating if this job schedule is disabled.
     /// </summary>
-    public bool Disabled { get; private set; }
+    public bool Disabled
+    {
+        get;
+        private set;
+    }
 
-    internal List<Action> Jobs { get; private set; }
+    internal List<Action> Jobs
+    {
+        get;
+        private set;
+    }
 
-    internal Func<DateTime, DateTime> CalculateNextRun { get; set; }
+    internal Func<DateTime, DateTime> CalculateNextRun
+    {
+        get;
+        set;
+    }
 
-    internal TimeSpan DelayRunFor { get; set; }
+    internal TimeSpan DelayRunFor
+    {
+        get;
+        set;
+    }
 
-    internal ICollection<Schedule> AdditionalSchedules { get; set; }
+    internal ICollection<Schedule> AdditionalSchedules
+    {
+        get;
+        set;
+    }
 
-    internal Schedule Parent { get; set; }
+    internal Schedule Parent
+    {
+        get;
+        set;
+    }
 
-    internal bool PendingRunOnce { get; set; }
+    internal bool PendingRunOnce
+    {
+        get;
+        set;
+    }
 
-    internal object Reentrant { get; set; }
+    internal object Reentrant
+    {
+        get;
+        set;
+    }
 
     /// <summary>
     /// Schedules a new job in the registry.
     /// </summary>
     /// <param name="action">Job to schedule.</param>
-    public Schedule(Action action) : this([action]) { }
+    public Schedule(Action action) : this([action])
+    {
+    }
 
     /// <summary>
     /// Schedules a new job in the registry.
@@ -70,9 +112,10 @@ public class Schedule
     /// <param name="job">Job to run.</param>
     public Schedule AndThen(Action job)
     {
-        ArgumentNullException.ThrowIfNull(job);
+        job = job ?? throw new ArgumentNullException(nameof(job));
 
         Jobs.Add(job);
+
         return this;
     }
 
@@ -82,9 +125,10 @@ public class Schedule
     /// <param name="job">Job to run.</param>
     public Schedule AndThen(IJob job)
     {
-        ArgumentNullException.ThrowIfNull(job);
+        job = job ?? throw new ArgumentNullException(nameof(job));
 
         Jobs.Add(JobManager.GetJobAction(job));
+
         return this;
     }
 
@@ -94,12 +138,12 @@ public class Schedule
     /// <param name="job">Job to run.</param>
     public Schedule AndThen(Func<IJob> job)
     {
-        ArgumentNullException.ThrowIfNull(job);
+        job = job ?? throw new ArgumentNullException(nameof(job));
 
         Jobs.Add(JobManager.GetJobAction(job));
+
         return this;
     }
-
 
     /// <summary>
     /// Schedules another job to be run with this schedule.
@@ -108,6 +152,7 @@ public class Schedule
     public Schedule AndThen<T>() where T : IJob
     {
         Jobs.Add(JobManager.GetJobAction<T>());
+
         return this;
     }
 
@@ -135,6 +180,7 @@ public class Schedule
     public TimeUnit ToRunOnceIn(int interval)
     {
         PendingRunOnce = true;
+
         return new TimeUnit(this, interval);
     }
 
@@ -145,8 +191,7 @@ public class Schedule
     /// <param name="minutes">The minutes (0 through 59).</param>
     public SpecificTimeUnit ToRunOnceAt(int hours, int minutes)
     {
-        var dateTime =
-            new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, hours, minutes, 0);
+        var dateTime = new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, hours, minutes, 0);
 
         return ToRunOnceAt(dateTime < JobManager.Now ? dateTime.AddDays(1) : dateTime);
     }
@@ -170,6 +215,7 @@ public class Schedule
     public Schedule WithName(string name)
     {
         Name = name;
+
         return this;
     }
 
@@ -179,6 +225,7 @@ public class Schedule
     public Schedule NonReentrant()
     {
         Reentrant ??= new object();
+
         return this;
     }
 

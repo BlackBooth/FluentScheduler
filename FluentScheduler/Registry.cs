@@ -11,7 +11,11 @@ public class Registry
 {
     private bool _allJobsConfiguredAsNonReentrant;
 
-    internal List<Schedule> Schedules { get; private set; }
+    internal List<Schedule> Schedules
+    {
+        get;
+        private set;
+    }
 
     /// <summary>
     /// Default ctor.
@@ -28,6 +32,7 @@ public class Registry
     public void NonReentrantAsDefault()
     {
         _allJobsConfiguredAsNonReentrant = true;
+
         lock (((ICollection)Schedules).SyncRoot)
         {
             foreach (var schedule in Schedules)
@@ -41,7 +46,7 @@ public class Registry
     /// <param name="job">Job to run.</param>
     public Schedule Schedule(Action job)
     {
-        ArgumentNullException.ThrowIfNull(job);
+        job = job ?? throw new ArgumentNullException(nameof(job));
 
         return Schedule(job, null);
     }
@@ -52,7 +57,7 @@ public class Registry
     /// <param name="job">Job to run.</param>
     public Schedule Schedule(IJob job)
     {
-        ArgumentNullException.ThrowIfNull(job);
+        job = job ?? throw new ArgumentNullException(nameof(job));
 
         return Schedule(JobManager.GetJobAction(job), null);
     }
@@ -72,7 +77,7 @@ public class Registry
     /// <param name="job">Factory method creating a IJob instance to run.</param>
     public Schedule Schedule(Func<IJob> job)
     {
-        ArgumentNullException.ThrowIfNull(job);
+        job = job ?? throw new ArgumentNullException(nameof(job));
 
         return Schedule(JobManager.GetJobAction(job), null);
     }

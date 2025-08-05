@@ -138,7 +138,7 @@ public static class JobManager
     /// <param name="registries">Registries of jobs to run</param>
     public static void Initialize(params Registry[] registries)
     {
-        ArgumentNullException.ThrowIfNull(registries);
+        registries = registries ?? throw new ArgumentNullException(nameof(registries));
 
         CalculateNextRun(registries.SelectMany(r => r.Schedules)).ToList().ForEach(RunJob);
         Start();
@@ -227,8 +227,8 @@ public static class JobManager
     /// <param name="schedule">Job schedule to add.</param>
     public static void AddJob(Action job, Action<Schedule> schedule)
     {
-        ArgumentNullException.ThrowIfNull(job);
-        ArgumentNullException.ThrowIfNull(schedule);
+        job = job ?? throw new ArgumentNullException(nameof(job));
+        schedule = schedule ?? throw new ArgumentNullException(nameof(schedule));
 
         AddJob(schedule, new Schedule(job));
     }
@@ -240,8 +240,8 @@ public static class JobManager
     /// <param name="schedule">Job schedule to add.</param>
     public static void AddJob(IJob job, Action<Schedule> schedule)
     {
-        ArgumentNullException.ThrowIfNull(job);
-        ArgumentNullException.ThrowIfNull(schedule);
+        job = job ?? throw new ArgumentNullException(nameof(job));
+        schedule = schedule ?? throw new ArgumentNullException(nameof(schedule));
 
         AddJob(schedule, new Schedule(GetJobAction(job)));
     }
@@ -251,9 +251,9 @@ public static class JobManager
     /// </summary>
     /// <typeparam name="T">Job to run.</typeparam>
     /// <param name="schedule">Job schedule to add.</param>
-    public static void AddJob<T>(Action<Schedule> schedule) where T : IJob
+    public static void AddJob<T>(Action<Schedule> schedule) where T : IAsyncJob
     {
-        ArgumentNullException.ThrowIfNull(schedule);
+        schedule = schedule ?? throw new ArgumentNullException(nameof(schedule));
 
         AddJob(schedule, new Schedule(GetJobAction<T>()) { Name = typeof(T).Name });
     }
@@ -348,85 +348,51 @@ public static class JobManager
 
     private static void ScheduleJobs()
     {
-        _timer.Change(Timeout.Infinite, Timeout.Infinite);
-        _schedules.Sort();
-
-        if (!_schedules.Any())
-            return;
-
-        var firstJob = _schedules.First();
-        if (firstJob.NextRun <= Now)
+        while (true)
         {
-            while (true)
+            _timer.Change(Timeout.Infinite, Timeout.Infinite);
+            _schedules.Sort();
+
+            if (!_schedules.Any())
+                break;
+
+            var firstJob = _schedules.First();
+            if (firstJob.NextRun <= Now)
             {
-                _timer.Change(Timeout.Infinite, Timeout.Infinite);
-                _schedules.Sort();
-
-                if (!_schedules.Any())
-                    break;
-
-                var firstJob = _schedules.First();
-                if (firstJob.NextRun <= Now)
+                RunJob(firstJob);
+                if (firstJob.CalculateNextRun == null)
                 {
-                    RunJob(firstJob);
-                    if (firstJob.CalculateNextRun == null)
-                    {
-                        // probably a ToRunNow().DelayFor() job, there's no CalculateNextRun
-                    }
-                    else
-                    {
-                        firstJob.NextRun = firstJob.CalculateNextRun(Now.AddMilliseconds(1));
-                    }
-
-                    if (firstJob.NextRun <= Now || firstJob.PendingRunOnce)
-                    {
-                        _schedules.Remove(firstJob);
-                    }
-
-                    firstJob.PendingRunOnce = false;
-                    continue;
-                }
-
-                var interval = firstJob.NextRun - Now;
-
-                if (interval <= TimeSpan.Zero)
-                {
-                    continue;
+                    // probably a ToRunNow().DelayFor() job, there's no CalculateNextRun
                 }
                 else
                 {
-                    if (interval.TotalMilliseconds > _maxTimerInterval)
-                        interval = TimeSpan.FromMilliseconds(_maxTimerInterval);
-
-                    _timer.Change(interval, interval);
+                    firstJob.NextRun = firstJob.CalculateNextRun(Now.AddMilliseconds(1));
                 }
 
-                break;
+                if (firstJob.NextRun <= Now || firstJob.PendingRunOnce)
+                {
+                    _schedules.Remove(firstJob);
+                }
+
+                firstJob.PendingRunOnce = false;
+                continue;
             }
 
-            if (firstJob.NextRun <= Now || firstJob.PendingRunOnce)
+            var interval = firstJob.NextRun - Now;
+
+            if (interval <= TimeSpan.Zero)
             {
-                _schedules.Remove(firstJob);
+                continue;
+            }
+            else
+            {
+                if (interval.TotalMilliseconds > _maxTimerInterval)
+                    interval = TimeSpan.FromMilliseconds(_maxTimerInterval);
+
+                _timer.Change(interval, interval);
             }
 
-            firstJob.PendingRunOnce = false;
-            ScheduleJobs();
-            return;
-        }
-
-        var interval = firstJob.NextRun - Now;
-
-        if (interval <= TimeSpan.Zero)
-        {
-            ScheduleJobs();
-            return;
-        }
-        else
-        {
-            if (interval.TotalMilliseconds > _maxTimerInterval)
-                interval = TimeSpan.FromMilliseconds(_maxTimerInterval);
-
-            _timer.Change(interval, interval);
+            break;
         }
     }
 

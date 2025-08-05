@@ -19,7 +19,7 @@ public static class DelayForExtensions
     /// <param name="interval">Interval to wait.</param>
     public static DelayTimeUnit DelayFor(this SpecificTimeUnit unit, int interval)
     {
-        ArgumentNullException.ThrowIfNull(unit);
+        unit = unit ?? throw new ArgumentNullException(nameof(unit));
 
         return DelayFor(unit.Schedule, interval);
     }
@@ -31,7 +31,7 @@ public static class DelayForExtensions
     /// <param name="interval">Interval to wait.</param>
     public static DelayTimeUnit DelayFor(this MillisecondUnit unit, int interval)
     {
-        ArgumentNullException.ThrowIfNull(unit);
+        unit = unit ?? throw new ArgumentNullException(nameof(unit));
 
         return DelayFor(unit.Schedule, interval);
     }
@@ -43,7 +43,7 @@ public static class DelayForExtensions
     /// <param name="interval">Interval to wait.</param>
     public static DelayTimeUnit DelayFor(this SecondUnit unit, int interval)
     {
-        ArgumentNullException.ThrowIfNull(unit);
+        unit = unit ?? throw new ArgumentNullException(nameof(unit));
 
         return DelayFor(unit.Schedule, interval);
     }
@@ -55,7 +55,7 @@ public static class DelayForExtensions
     /// <param name="interval">Interval to wait.</param>
     public static DelayTimeUnit DelayFor(this MinuteUnit unit, int interval)
     {
-        ArgumentNullException.ThrowIfNull(unit);
+        unit = unit ?? throw new ArgumentNullException(nameof(unit));
 
         return DelayFor(unit.Schedule, interval);
     }
@@ -67,7 +67,7 @@ public static class DelayForExtensions
     /// <param name="interval">Interval to wait.</param>
     public static DelayTimeUnit DelayFor(this HourUnit unit, int interval)
     {
-        ArgumentNullException.ThrowIfNull(unit);
+        unit = unit ?? throw new ArgumentNullException(nameof(unit));
 
         return DelayFor(unit.Schedule, interval);
     }
@@ -79,7 +79,7 @@ public static class DelayForExtensions
     /// <param name="interval">Interval to wait.</param>
     public static DelayTimeUnit DelayFor(this DayUnit unit, int interval)
     {
-        ArgumentNullException.ThrowIfNull(unit);
+        unit = unit ?? throw new ArgumentNullException(nameof(unit));
 
         return DelayFor(unit.Schedule, interval);
     }
@@ -91,7 +91,7 @@ public static class DelayForExtensions
     /// <param name="interval">Interval to wait.</param>
     public static DelayTimeUnit DelayFor(this WeekUnit unit, int interval)
     {
-        ArgumentNullException.ThrowIfNull(unit);
+        unit = unit ?? throw new ArgumentNullException(nameof(unit));
 
         return DelayFor(unit.Schedule, interval);
     }
@@ -103,7 +103,7 @@ public static class DelayForExtensions
     /// <param name="interval">Interval to wait.</param>
     public static DelayTimeUnit DelayFor(this MonthUnit unit, int interval)
     {
-        ArgumentNullException.ThrowIfNull(unit);
+        unit = unit ?? throw new ArgumentNullException(nameof(unit));
 
         return DelayFor(unit.Schedule, interval);
     }

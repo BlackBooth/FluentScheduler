@@ -13,13 +13,4 @@ public interface IAsyncJob : IJob
     /// Executes the job.
     /// </summary>
     Task ExecuteAsync();
-
-    /// <summary>
-    /// Executes the job, synchronously.
-    /// </summary>
-    [SuppressMessage("Design", "CA1033")]
-    void IJob.Execute()
-    {
-        ExecuteAsync().Wait();
-    }
 }

@@ -18,7 +18,7 @@ public static class RestrictableUnitExtensions
     public static ITimeRestrictableUnit Between(this ITimeRestrictableUnit unit, int startHour,
         int startMinute, int endHour, int endMinute)
     {
-        ArgumentNullException.ThrowIfNull(unit);
+        unit = unit ?? throw new ArgumentNullException(nameof(unit));
 
         var timeOfDayRunnableCalculator = new TimeOfDayRunnableCalculator(startHour, startMinute, endHour, endMinute);
 
@@ -45,7 +45,7 @@ public static class RestrictableUnitExtensions
     /// </summary>
     public static IDayRestrictableUnit WeekdaysOnly(this IDayRestrictableUnit unit)
     {
-        ArgumentNullException.ThrowIfNull(unit);
+        unit = unit ?? throw new ArgumentNullException(nameof(unit));
 
         var unboundCalculateNextRun = unit.Schedule.CalculateNextRun;
         unit.Schedule.CalculateNextRun = x =>
